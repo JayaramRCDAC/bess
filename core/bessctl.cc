@@ -486,6 +486,7 @@ class BESSControlImpl final : public BESSControl::Service {
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     pause_all_workers();
+    LOG(INFO) << "*** BESSD by Jayaram R ***";
     LOG(INFO) << "*** All workers have been paused ***";
     return Status::OK;
   }
