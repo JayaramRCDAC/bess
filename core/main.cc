@@ -62,8 +62,10 @@ int main(int argc, char *argv[]) {
   int signal_fd = -1;
   if (FLAGS_f) {
     LOG(INFO) << "Launching BESS daemon in process mode...";
+    LOG(INFO) << "BESS - By Jayaram R";
   } else {
     LOG(INFO) << "Launching BESS daemon in background...";
+    LOG(INFO) << "BESS - By Jayaram R";
 
     if (FLAGS_logtostderr == true || FLAGS_alsologtostderr == true) {
       FLAGS_logtostderr = false;
