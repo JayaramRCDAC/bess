@@ -53,6 +53,7 @@ void UnixSocketAcceptThread::Run() {
   fds[1].events = POLLRDHUP;
 
   while (true) {
+    LOG(INFO) << "Inside UnixSocketAcceptThread loop";
     // negative FDs are ignored by ppoll()
     fds[1].fd = owner_->client_fd_;
     int res = ppoll(fds, 2, nullptr, Sigmask());
@@ -71,6 +72,7 @@ void UnixSocketAcceptThread::Run() {
       // new client connected
       int fd;
       while (true) {
+        LOG(INFO) << "Inside accept4 loop";
         fd = accept4(owner_->listen_fd_, nullptr, nullptr, SOCK_NONBLOCK);
         if (fd >= 0 || errno != EINTR) {
           break;
