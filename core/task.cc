@@ -140,6 +140,16 @@ struct task_result Task::operator()(Context *ctx) const {
 
 void Task::ProcessModuleAndOGates(Context *ctx, Module *module,
                                   bess::PacketBatch *batch) const {
+  // Retrieve the ingate from the module
+  bess::IGate *igate = module->igate();
+
+  // Check if the ingate is valid before processing
+  if (!igate) {
+    // Handle the case where the ingate is not valid
+    // You may log an error or take appropriate action
+    return;
+  }
+
   for (auto &hook : igate->hooks()) {
     hook->ProcessBatch(batch);
   }
