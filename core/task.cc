@@ -47,7 +47,8 @@ void Task::Attach(bess::LeafTrafficClass *c) {
   c_ = c;
 }
 
-/*struct task_result Task::operator()(Context *ctx) const {
+/*
+struct task_result Task::operator()(Context *ctx) const {
   bess::PacketBatch init_batch;
   ClearPacketBatch();
 
@@ -91,17 +92,8 @@ void Task::Attach(bess::LeafTrafficClass *c) {
   deadend(ctx, &dead_batch_);
 
   return result;
-}*/
-
-void Task::ProcessBatch(Context *ctx, bess::PacketBatch *batch) const {
-  // Process module
-  bess::IGate *igate = batch->start_gate();
-  Module *m = igate->module();  // Assuming igate has a reference to the Module
-  m->ProcessBatch(ctx, batch);
-
-  // Process output gates
-  m->ProcessOGates(ctx);  // Assuming ProcessOGates is a member function of Module
 }
+*/
 
 struct task_result Task::operator()(Context *ctx) const {
   bess::PacketBatch init_batch;
@@ -111,7 +103,7 @@ struct task_result Task::operator()(Context *ctx) const {
   struct task_result result = module_->RunTask(ctx, &init_batch, arg_);
 
   // Process initial batch
-  ProcessBatch(ctx, &init_batch);
+  ProcessModuleAndOGates(ctx, module_, &init_batch);
 
   // Process remaining batches
   while (next_gate_ || !igates_to_run_.empty()) {
@@ -136,19 +128,25 @@ struct task_result Task::operator()(Context *ctx) const {
 
     ctx->current_igate = igate->gate_idx();
 
-    // Process hooks
-    for (auto &hook : igate->hooks()) {
-      hook->ProcessBatch(batch);
-    }
-
     // Process module and output gates
-    ProcessBatch(ctx, batch);
+    ProcessModuleAndOGates(ctx, igate->module(), batch);
   }
 
   // Process any remaining packets
   deadend(ctx, &dead_batch_);
 
   return result;
+}
+
+void Task::ProcessModuleAndOGates(Context *ctx, Module *module,
+                                  bess::PacketBatch *batch) const {
+  for (auto &hook : igate->hooks()) {
+    hook->ProcessBatch(batch);
+  }
+
+  module->ProcessBatch(ctx, batch);  // Process module
+
+  module->ProcessOGates(ctx);  // Process output gates
 }
 
 // Compute constraints for the pipeline starting at this task.

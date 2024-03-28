@@ -336,7 +336,7 @@ void *Worker::Run(void *_arg) {
 
 void *run_worker(void *_arg) {
   CHECK_EQ(memcmp(&current_worker, new Worker(), sizeof(Worker)), 0);
-  LOG(INFO) << "Inside run_worker()" ;
+  LOG(INFO) << "Inside run_worker()";
   return current_worker.Run(_arg);
 }
 
