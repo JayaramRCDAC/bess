@@ -57,6 +57,7 @@ struct task_result Task::operator()(Context *ctx) const {
   // igates_to_run_ : If next module connection is not chained (merged),
   // check priority to choose which module run next
   while (next_gate_ || !igates_to_run_.empty()) {
+    LOG(INFO) << "Inside task_result Task::operator() while loop" ;
     bess::IGate *igate;
     bess::PacketBatch *batch;
 

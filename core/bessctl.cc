@@ -1947,6 +1947,11 @@ void ApiServer::Run() {
     return;
   }
 
+  LOG(INFO) << "At ApiServer::Run() before shutdown()";
   service.set_shutdown_func([&server]() { server->Shutdown(); });
+
+  LOG(INFO) << "At ApiServer::Run() after shutdown()";
   server->Wait();
+
+  LOG(INFO) << "At ApiServer::Run() after Wait()";
 }
