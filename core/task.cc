@@ -93,6 +93,16 @@ void Task::Attach(bess::LeafTrafficClass *c) {
   return result;
 }*/
 
+void Task::ProcessBatch(Context *ctx, bess::PacketBatch *batch) const {
+  // Process module
+  bess::IGate *igate = batch->start_gate();
+  Module *m = igate->module();  // Assuming igate has a reference to the Module
+  m->ProcessBatch(ctx, batch);
+
+  // Process output gates
+  m->ProcessOGates(ctx);  // Assuming ProcessOGates is a member function of Module
+}
+
 struct task_result Task::operator()(Context *ctx) const {
   bess::PacketBatch init_batch;
   ClearPacketBatch();
@@ -105,7 +115,6 @@ struct task_result Task::operator()(Context *ctx) const {
 
   // Process remaining batches
   while (next_gate_ || !igates_to_run_.empty()) {
-    LOG(INFO) << "Inside task_result Task::operator() while loop" ;
     bess::IGate *igate;
     bess::PacketBatch *batch;
 
@@ -132,25 +141,14 @@ struct task_result Task::operator()(Context *ctx) const {
       hook->ProcessBatch(batch);
     }
 
-    // Process module and ogates
+    // Process module and output gates
     ProcessBatch(ctx, batch);
-    ProcessOGates(ctx);
   }
 
   // Process any remaining packets
   deadend(ctx, &dead_batch_);
 
   return result;
-}
-
-void Task::ProcessBatch(Context *ctx, bess::PacketBatch *batch) const {
-  // Process module
-  bess::IGate *igate = batch->igate();
-  Module *m = igate->module();
-  m->ProcessBatch(ctx, batch);
-
-  // Process ogates
-  m->ProcessOGates(ctx);
 }
 
 // Compute constraints for the pipeline starting at this task.
