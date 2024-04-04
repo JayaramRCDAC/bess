@@ -228,7 +228,7 @@ class DefaultScheduler : public Scheduler {
   virtual ~DefaultScheduler() {}
 
   // Runs the scheduler loop forever.
-  void ScheduleLoop() override {
+  /*void ScheduleLoop() override {
     LOG(INFO) << "class DefaultScheduler ScheduleLoop()";
     uint64_t now;
     // How many rounds to go before we do accounting.
@@ -255,15 +255,48 @@ class DefaultScheduler : public Scheduler {
 
       ScheduleOnce(&ctx);
     }
+  }*/
+
+  void ScheduleLoop() override {
+    LOG(INFO) << "class DefaultScheduler ScheduleLoop()";
+    uint64_t now;
+    // How many rounds to go before we do accounting.
+    const uint64_t accounting_mask = 0xff;
+    static_assert(((accounting_mask + 1) & accounting_mask) == 0,
+                  "Accounting mask must be (2^n)-1");
+
+    this->checkpoint_ = now = rdtsc();
+
+    Context ctx = {};
+    ctx.wid = current_worker.wid();
+
+    bool continueLoop = true;  // Flag to control loop termination
+
+    // The main scheduling, running, accounting loop.
+    for (uint64_t round = 0; continueLoop; ++round) {
+      LOG(INFO) << "class DefaultScheduler ScheduleLoop() - for loop";
+      // Periodic check, to mitigate expensive operations.
+      if ((round & accounting_mask) == 0) {
+        if (current_worker.is_pause_requested()) {
+          if (current_worker.BlockWorker()) {
+            continueLoop = false;  // Exit the loop if requested to pause
+          }
+        }
+      }
+
+      ScheduleOnce(&ctx);
+    }
   }
 
   // Runs the scheduler once.
   void ScheduleOnce(Context *ctx) {
+    LOG(INFO) << "Inside ScheduleOnce()";
     resource_arr_t usage;
 
     // Schedule.
+    LOG(INFO) << "Inside ScheduleOnce() - Before Scheduler::Next()";
     LeafTrafficClass *leaf = Scheduler::Next(this->checkpoint_);
-
+    LOG(INFO) << "Inside ScheduleOnce() - After Scheduler::Next()";
     uint64_t now;
     if (leaf) {
       ctx->current_tsc = this->checkpoint_;  // Tasks see updated tsc.
