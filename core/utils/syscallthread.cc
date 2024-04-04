@@ -101,7 +101,7 @@ static inline void PthreadSetSigmask(const sigset_t *mask) {
  * is pselect()/ppoll(), blocks all signals entirely.
  */
 void SyscallThread::RunInThread(SyscallThread *syscaller, bool reliable) {
-  LOG(INFO) << "Inside RunInThread function";
+  // LOG(INFO) << "Inside RunInThread function";
   // Block the appropriate set of signals.
   PthreadSetSigmask(GetMask(reliable));
 
@@ -115,9 +115,9 @@ void SyscallThread::RunInThread(SyscallThread *syscaller, bool reliable) {
   // in this case, do NOT run the user's code (it might block forever,
   // if pfuncs is true).
   if (!syscaller->exit_requested_) {
-    LOG(INFO) << "Inside RunInThread function - Before Run()";
+    // LOG(INFO) << "Inside RunInThread function - Before Run()";
     syscaller->Run();
-    LOG(INFO) << "Inside RunInThread function - After Run()";
+    // LOG(INFO) << "Inside RunInThread function - After Run()";
   }
 
   // We're done; remark on this and terminate (by returning).
