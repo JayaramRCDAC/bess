@@ -171,9 +171,6 @@ class Task {
 
   struct task_result operator()(Context *ctx) const;
 
-  void ProcessModuleAndOGates(Context *ctx, Module *module,
-                              bess::PacketBatch *batch) const;
-
   // Compute constraints for the pipeline starting at this task.
   placement_constraint GetSocketConstraints() const;
 
