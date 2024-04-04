@@ -181,6 +181,7 @@ class Scheduler {
 
   // Selects the next TrafficClass to run.
   LeafTrafficClass *Next(uint64_t tsc) {
+    LOG(INFO) << "LeafTrafficClass *Next";
     WakeTCs(tsc);
 
     if (!root_ || root_->blocked()) {
@@ -190,6 +191,7 @@ class Scheduler {
 
     TrafficClass *c = root_;
     while (c->policy_ != POLICY_LEAF) {
+      LOG(INFO) << "LeafTrafficClass *Next - While loop";
       c = c->PickNextChild();
     }
 
@@ -227,6 +229,7 @@ class DefaultScheduler : public Scheduler {
 
   // Runs the scheduler loop forever.
   void ScheduleLoop() override {
+    LOG(INFO) << "class DefaultScheduler ScheduleLoop()";
     uint64_t now;
     // How many rounds to go before we do accounting.
     const uint64_t accounting_mask = 0xff;
@@ -240,6 +243,7 @@ class DefaultScheduler : public Scheduler {
 
     // The main scheduling, running, accounting loop.
     for (uint64_t round = 0;; ++round) {
+      LOG(INFO) << "class DefaultScheduler ScheduleLoop() - for loop";
       // Periodic check, to mitigate expensive operations.
       if ((round & accounting_mask) == 0) {
         if (current_worker.is_pause_requested()) {
