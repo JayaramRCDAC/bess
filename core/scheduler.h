@@ -228,7 +228,7 @@ class DefaultScheduler : public Scheduler {
   virtual ~DefaultScheduler() {}
 
   // Runs the scheduler loop forever.
-  /*void ScheduleLoop() override {
+  void ScheduleLoop() override {
     LOG(INFO) << "class DefaultScheduler ScheduleLoop()";
     uint64_t now;
     // How many rounds to go before we do accounting.
@@ -246,40 +246,15 @@ class DefaultScheduler : public Scheduler {
       LOG(INFO) << "class DefaultScheduler ScheduleLoop() - for loop";
       // Periodic check, to mitigate expensive operations.
       if ((round & accounting_mask) == 0) {
+        LOG(INFO) << "round: " << round
+                  << " & accounting_mask: " << accounting_mask;
         if (current_worker.is_pause_requested()) {
+          LOG(INFO) << "current_worker.is_pause_requested(): "
+                    << current_worker.is_pause_requested();
           if (current_worker.BlockWorker()) {
+            LOG(INFO) << "current_worker.BlockWorker(): "
+                      << current_worker.BlockWorker();
             break;
-          }
-        }
-      }
-
-      ScheduleOnce(&ctx);
-    }
-  }*/
-
-  void ScheduleLoop() override {
-    LOG(INFO) << "class DefaultScheduler ScheduleLoop()";
-    uint64_t now;
-    // How many rounds to go before we do accounting.
-    const uint64_t accounting_mask = 0xff;
-    static_assert(((accounting_mask + 1) & accounting_mask) == 0,
-                  "Accounting mask must be (2^n)-1");
-
-    this->checkpoint_ = now = rdtsc();
-
-    Context ctx = {};
-    ctx.wid = current_worker.wid();
-
-    bool continueLoop = true;  // Flag to control loop termination
-
-    // The main scheduling, running, accounting loop.
-    for (uint64_t round = 0; continueLoop; ++round) {
-      LOG(INFO) << "class DefaultScheduler ScheduleLoop() - for loop";
-      // Periodic check, to mitigate expensive operations.
-      if ((round & accounting_mask) == 0) {
-        if (current_worker.is_pause_requested()) {
-          if (current_worker.BlockWorker()) {
-            continueLoop = false;  // Exit the loop if requested to pause
           }
         }
       }
