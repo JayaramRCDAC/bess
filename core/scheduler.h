@@ -245,15 +245,15 @@ class DefaultScheduler : public Scheduler {
     for (uint64_t round = 0;; ++round) {
       LOG(INFO) << "class DefaultScheduler ScheduleLoop() - for loop";
       // Periodic check, to mitigate expensive operations.
+      LOG(INFO) << "round: " << round
+                << " & accounting_mask: " << accounting_mask;
+      LOG(INFO) << "current_worker.is_pause_requested(): "
+                << current_worker.is_pause_requested();
+      LOG(INFO) << "current_worker.BlockWorker(): "
+                << current_worker.BlockWorker();
       if ((round & accounting_mask) == 0) {
-        LOG(INFO) << "round: " << round
-                  << " & accounting_mask: " << accounting_mask;
         if (current_worker.is_pause_requested()) {
-          LOG(INFO) << "current_worker.is_pause_requested(): "
-                    << current_worker.is_pause_requested();
           if (current_worker.BlockWorker()) {
-            LOG(INFO) << "current_worker.BlockWorker(): "
-                      << current_worker.BlockWorker();
             break;
           }
         }
