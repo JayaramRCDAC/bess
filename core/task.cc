@@ -47,7 +47,6 @@ void Task::Attach(bess::LeafTrafficClass *c) {
   c_ = c;
 }
 
-/*
 struct task_result Task::operator()(Context *ctx) const {
   bess::PacketBatch init_batch;
   ClearPacketBatch();
@@ -85,8 +84,9 @@ struct task_result Task::operator()(Context *ctx) const {
   deadend(ctx, &dead_batch_);
 
   return result;
-}*/
+}
 
+/*
 struct task_result Task::operator()(Context *ctx) const {
   bess::PacketBatch init_batch;
   ClearPacketBatch();
@@ -131,6 +131,7 @@ struct task_result Task::operator()(Context *ctx) const {
 
   return result;
 }
+*/
 
 // Compute constraints for the pipeline starting at this task.
 placement_constraint Task::GetSocketConstraints() const {
