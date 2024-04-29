@@ -1,3 +1,4 @@
+
 // Copyright (c) 2014-2016, The Regents of the University of California.
 // Copyright (c) 2016-2017, Nefeli Networks, Inc.
 // All rights reserved.
@@ -181,7 +182,6 @@ class Scheduler {
 
   // Selects the next TrafficClass to run.
   LeafTrafficClass *Next(uint64_t tsc) {
-    LOG(INFO) << "LeafTrafficClass *Next";
     WakeTCs(tsc);
 
     if (!root_ || root_->blocked()) {
@@ -191,7 +191,6 @@ class Scheduler {
 
     TrafficClass *c = root_;
     while (c->policy_ != POLICY_LEAF) {
-      LOG(INFO) << "LeafTrafficClass *Next - While loop";
       c = c->PickNextChild();
     }
 
@@ -229,7 +228,6 @@ class DefaultScheduler : public Scheduler {
 
   // Runs the scheduler loop forever.
   void ScheduleLoop() override {
-    LOG(INFO) << "class DefaultScheduler ScheduleLoop()";
     uint64_t now;
     // How many rounds to go before we do accounting.
     const uint64_t accounting_mask = 0xff;
@@ -243,14 +241,7 @@ class DefaultScheduler : public Scheduler {
 
     // The main scheduling, running, accounting loop.
     for (uint64_t round = 0;; ++round) {
-      LOG(INFO) << "class DefaultScheduler ScheduleLoop() - for loop";
       // Periodic check, to mitigate expensive operations.
-      LOG(INFO) << "round: " << round
-                << " & accounting_mask: " << accounting_mask;
-      LOG(INFO) << "current_worker.is_pause_requested(): "
-                << current_worker.is_pause_requested();
-      LOG(INFO) << "current_worker.BlockWorker(): "
-                << current_worker.BlockWorker();
       if ((round & accounting_mask) == 0) {
         if (current_worker.is_pause_requested()) {
           if (current_worker.BlockWorker()) {
@@ -265,13 +256,11 @@ class DefaultScheduler : public Scheduler {
 
   // Runs the scheduler once.
   void ScheduleOnce(Context *ctx) {
-    LOG(INFO) << "Inside ScheduleOnce()";
     resource_arr_t usage;
 
     // Schedule.
-    LOG(INFO) << "Inside ScheduleOnce() - Before Scheduler::Next()";
     LeafTrafficClass *leaf = Scheduler::Next(this->checkpoint_);
-    LOG(INFO) << "Inside ScheduleOnce() - After Scheduler::Next()";
+
     uint64_t now;
     if (leaf) {
       ctx->current_tsc = this->checkpoint_;  // Tasks see updated tsc.

@@ -486,8 +486,6 @@ class BESSControlImpl final : public BESSControl::Service {
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 
     pause_all_workers();
-    LOG(INFO) << "*** BESSD by CDAC - Jayaram R @ " << __DATE__ << ",  "
-              << __TIME__ << " ***";
     LOG(INFO) << "*** All workers have been paused ***";
     return Status::OK;
   }
@@ -1948,11 +1946,6 @@ void ApiServer::Run() {
     return;
   }
 
-  LOG(INFO) << "At ApiServer::Run() before shutdown()";
   service.set_shutdown_func([&server]() { server->Shutdown(); });
-
-  LOG(INFO) << "At ApiServer::Run() after shutdown()";
   server->Wait();
-
-  LOG(INFO) << "At ApiServer::Run() after Wait()";
 }
